@@ -1,0 +1,131 @@
+{
+  "version": "1.0",
+  "created": "2026-09-09",
+  "status": "criterios congelados antes de descargar y antes de observar ningún conteo de detecciones",
+  "purpose": "Construir una serie homogénea de actividad de fuego de agosto para Tolima y sus siete vecinos de primer orden, como mitad faltante de la pregunta principal.",
+  "screening_bbox": {
+    "west": -78.0,
+    "south": 0.9,
+    "east": -73.0,
+    "north": 5.9,
+    "derivation": "envolvente de la unión de los ocho departamentos en geoBoundaries COL ADM1, redondeada hacia afuera a un décimo de grado",
+    "exact_union_bounds": [
+      -77.927884,
+      0.958565,
+      -73.050834,
+      5.836703
+    ],
+    "note": "El rectángulo es de cribado. La asignación a departamento se hará después por contención dentro del polígono, no por el rectángulo."
+  },
+  "primary_source": {
+    "data_id": "VIIRS_SNPP_SP",
+    "seasons": [
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "reason": "único sensor con procesamiento estándar continuo desde el 20 de enero de 2012 según el servicio de disponibilidad consultado el 9 de septiembre de 2026"
+  },
+  "target_season_source": {
+    "data_id": "VIIRS_SNPP_NRT",
+    "season": 2026,
+    "reason": "el procesamiento estándar de agosto de 2026 no existe todavía y se espera hacia enero de 2027",
+    "mandatory_labelling": "cada fila conserva su nivel de procesamiento y las dos series nunca se combinan sin declararlo"
+  },
+  "sensitivity_source": {
+    "data_id": "VIIRS_NOAA20_SP",
+    "seasons": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "status": "descarga posterior, no incluida en esta ejecución"
+  },
+  "excluded_sources": {
+    "VIIRS_NOAA21": "solo existe en tiempo casi real y desde 2024",
+    "MODIS": "queda para una comprobación independiente posterior, no para la serie primaria"
+  },
+  "month": "August",
+  "request_rule": {
+    "endpoint": "https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/{source}/{west},{south},{east},{north}/{days}/{start}",
+    "maximum_days_per_request": 5,
+    "windows_per_season": [
+      {
+        "start": "08-01",
+        "days": 5
+      },
+      {
+        "start": "08-06",
+        "days": 5
+      },
+      {
+        "start": "08-11",
+        "days": 5
+      },
+      {
+        "start": "08-16",
+        "days": 5
+      },
+      {
+        "start": "08-21",
+        "days": 5
+      },
+      {
+        "start": "08-26",
+        "days": 5
+      },
+      {
+        "start": "08-31",
+        "days": 1
+      }
+    ],
+    "credential_handling": "la clave se lee del entorno, nunca se escribe en salidas crudas, manifiestos ni auditorías",
+    "amendment_2026-09-09": "La ventana máxima se fijó inicialmente en diez días por supuesto propio. El servicio respondió HTTP 400 con el mensaje que el rango esperado es de uno a cinco días. La ventana se corrigió a cinco días y las siete ventanas resultantes cubren agosto completo sin solapamiento. La corrección es técnica y no altera ningún criterio de análisis."
+  },
+  "acceptance_criteria": {
+    "all_primary_seasons_return_http_200": true,
+    "all_responses_share_identical_header": true,
+    "no_season_with_zero_rows_accepted_silently": "una temporada con cero filas detiene la construcción y se diagnostica antes de continuar",
+    "duplicate_rule": "las filas duplicadas exactas dentro de una temporada se cuentan y se reportan, no se eliminan en esta etapa",
+    "date_range_rule": "toda fila debe tener fecha de adquisición dentro de agosto de la temporada solicitada",
+    "raw_files_never_overwritten": true
+  },
+  "planned_activity_metrics": {
+    "note": "definidas antes de ver los datos, se calcularán en un script posterior",
+    "per_department_season": [
+      "número de detecciones",
+      "número de días con al menos una detección",
+      "número de celdas de un kilómetro con al menos una detección",
+      "número de municipios con al menos una detección, solo para Tolima",
+      "concentración espacial mediante índice de Gini sobre conteos por celda"
+    ],
+    "confidence_rule": "la métrica primaria usa todas las detecciones y la sensibilidad usa solo confianza nominal y alta",
+    "prohibited": [
+      "tratar una detección como un incendio",
+      "tratar el conteo como área quemada",
+      "combinar niveles de procesamiento sin declararlo",
+      "comparar entre sensores dentro de una misma serie"
+    ]
+  },
+  "interpretation_limits": [
+    "El conteo de detecciones depende del paso orbital, de la nubosidad y del umbral del algoritmo, además de la actividad de fuego.",
+    "La comparación entre departamentos dentro de una misma temporada no depende del nivel de procesamiento. La comparación entre temporadas sí depende de él mientras 2026 use tiempo casi real.",
+    "Ninguna métrica de esta serie mide ignición, causa ni severidad."
+  ]
+}

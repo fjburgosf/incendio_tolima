@@ -1,0 +1,71 @@
+{
+  "version": "1.0",
+  "created": "2026-09-09",
+  "status": "criterios congelados antes de ejecutar el script 148 y antes de observar cualquier valor de la climatología ampliada",
+  "purpose": "Sustituir el promedio mensual de déficit de presión de vapor por métricas diarias de peligro atmosférico, y situar agosto de 2026 dentro de una climatología de 35 temporadas de referencia.",
+  "reference_seasons": {"first": 1991, "last": 2025, "count": 35},
+  "target_season": 2026,
+  "sources": {
+    "reference": "data/raw/era5_land/august_climatology_1991_2025/era5_land_core_hourly_{year}_08_tolima_screening_bbox.grib",
+    "target": "data/interim/era5_land_hourly_grid_v1.npz",
+    "grid_rule": "data/interim/era5_land_grid_municipality_linkage.csv"
+  },
+  "spatial_rule": {
+    "total_centres": 989,
+    "retained_centres": 198,
+    "criterion": "centro de celda que cae de forma única dentro de la unión municipal de Tolima, regla ya congelada y reutilizada sin cambios",
+    "primary_weighting": "coseno de la latitud",
+    "sensitivity_weighting": "pesos iguales"
+  },
+  "temporal_rule": {
+    "hours_per_season": 744,
+    "days_per_season": 31,
+    "afternoon_hour_utc": 18,
+    "afternoon_hour_local_note": "18 UTC corresponde a las 13 horas en Colombia, cercano al máximo diurno de demanda atmosférica"
+  },
+  "metrics": {
+    "daily": [
+      "vapour_pressure_deficit_mean_kpa",
+      "vapour_pressure_deficit_max_kpa",
+      "vapour_pressure_deficit_afternoon_kpa",
+      "air_temperature_mean_c",
+      "air_temperature_max_c",
+      "wind_speed_mean_ms",
+      "wind_speed_max_ms"
+    ],
+    "daily_maximum_definition": "máximo horario de la serie regional ya promediada en el espacio, misma convención usada para la temperatura máxima en el artefacto previo",
+    "seasonal": [
+      "media de los máximos diarios",
+      "percentil 90 de los máximos diarios",
+      "número de días secos",
+      "racha máxima de días secos consecutivos"
+    ]
+  },
+  "dry_day_threshold": {
+    "definition": "percentil 90 de la distribución conjunta de máximos diarios de déficit de presión de vapor sobre las temporadas de referencia",
+    "computed_on": "solo 1991 a 2025",
+    "excludes_target_season": true,
+    "reason": "impedir que la temporada evaluada participe en la definición de su propio umbral"
+  },
+  "positioning": {
+    "rank_among_seasons": true,
+    "empirical_percentile": true,
+    "robust_z": "mediana y desviación absoluta mediana de las temporadas de referencia, escaladas por 1,4826",
+    "prohibited": "periodo de retorno, probabilidad de excedencia paramétrica, lenguaje causal"
+  },
+  "acceptance_criteria": {
+    "all_reference_seasons_present": true,
+    "hours_per_season_exact": 744,
+    "unique_grid_centres_exact": 989,
+    "retained_centres_exact": 198,
+    "no_missing_hours": true,
+    "no_nonfinite_values_in_retained_cells": true,
+    "vapour_pressure_deficit_minimum_tolerance_kpa": -0.005,
+    "expected_units": {"2t": "K", "2d": "K", "10u": "m s**-1", "10v": "m s**-1"}
+  },
+  "interpretation_limits": [
+    "El reanálisis describe la atmósfera regional y no la humedad del combustible ni el peligro operativo.",
+    "Agosto de 2026 puede provenir de la distribución preliminar del reanálisis y no de la consolidada. Debe comprobarse y declararse antes de someter.",
+    "Situar una temporada en una distribución de 36 valores no habilita afirmar tendencia, atribución ni causalidad."
+  ]
+}

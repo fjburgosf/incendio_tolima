@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "frozen_at": "2026-09-08 before construction of historical environmental summaries",
+  "inference_class": "descriptive comparative environmental characterization",
+  "purpose": "Place the August 2026 atmospheric configuration of Tolima in the limited set of technically eligible August GWIS seasons without treating event counts as a homogeneous occurrence series.",
+  "seasons": [2018, 2020, 2022, 2024, 2025, 2026],
+  "reference_seasons": [2018, 2020, 2022, 2024, 2025],
+  "target_season": 2026,
+  "temporal_domain": {
+    "calendar": "UTC",
+    "window": "August 1 00:00 through August 31 23:00 inclusive",
+    "reason": "All historical and 2026 sources contain this complete common UTC window. The supplementary September files are retained for later event-window work and are not used here."
+  },
+  "spatial_domain": {
+    "rule": "ERA5 Land grid-cell centre falls uniquely inside the existing Tolima municipality union",
+    "expected_grid_centres": 198,
+    "primary_weight": "cosine of latitude for each retained grid centre",
+    "sensitivity_weight": "equal weight per retained grid centre",
+    "reason": "The latitude span is modest but latitude weighting is a transparent approximation to equal-area grid-cell weighting. The equal-weight result is retained as a pre-specified sensitivity."
+  },
+  "variables": {
+    "air_temperature_mean_c": "Daily mean of grid-cell hourly 2 metre temperature in degrees Celsius, spatially aggregated with the pre-specified weights.",
+    "air_temperature_max_c": "Daily maximum of the hourly spatially aggregated 2 metre temperature series in degrees Celsius.",
+    "vapour_pressure_deficit_mean_kpa": "Daily mean of grid-cell hourly vapour pressure deficit derived from 2 metre temperature and dewpoint, then spatially aggregated.",
+    "wind_speed_mean_ms": "Daily mean of grid-cell hourly 10 metre wind speed derived from vector components, then spatially aggregated.",
+    "wind_speed_max_ms": "Daily maximum of the hourly spatially aggregated 10 metre wind-speed series."
+  },
+  "formulae": {
+    "temperature_c": "temperature_k minus 273.15",
+    "vapour_pressure_kpa": "0.6108 times exp of 17.27 times temperature_c divided by temperature_c plus 237.3",
+    "vapour_pressure_deficit_kpa": "saturation vapour pressure at air temperature minus vapour pressure at dewpoint temperature",
+    "wind_speed_ms": "square root of zonal wind squared plus meridional wind squared",
+    "negative_vpd_handling": "Values smaller than negative 0.005 kPa fail the construction gate. Values from negative 0.005 kPa through zero are set to zero and counted."
+  },
+  "seasonal_summaries": {
+    "mean": "Arithmetic mean of the 31 daily values.",
+    "p95": "Linear 95th percentile of the 31 daily values, retained to describe the high end of the daily distribution and not as a separate hypothesis test."
+  },
+  "comparison": {
+    "target_vs_reference": "Report the target seasonal summary, reference-season median, reference minimum and maximum, absolute difference from reference median, and the target rank among the six available seasonal values.",
+    "formal_hypothesis_testing": "No null-hypothesis test or causal attribution is planned because the reference set has five historical seasons selected through a technical GWIS-access gate rather than random sampling from a stationary climate population.",
+    "event_count_context": "GWIS August event counts are tabulated separately as product-specific operational counts. They are not modelled as wildfire occurrence, outcome, exposure, or proof of equal detection sensitivity across years."
+  },
+  "acceptance_criteria": {
+    "complete_hours_per_year": 744,
+    "complete_days_per_year": 31,
+    "common_grid_point_count": 989,
+    "retained_tolima_grid_centres": 198,
+    "nonfinite_values": 0,
+    "unexpected_or_duplicate_times": 0,
+    "negative_vpd_below_tolerance": 0,
+    "both_weighting_summaries_must_be_written": true
+  },
+  "prohibited_interpretations": [
+    "Causal attribution of ignition, fire spread, area burned, or institutional response.",
+    "Prediction or risk mapping.",
+    "Claiming that GWIS event counts measure complete wildfire occurrence or are equally detectable across years.",
+    "Use of precipitation before the separate accumulated-GRIB reconstruction and validation gate passes.",
+    "Pooling the NASA burned-area products or using them as validation of the 2026 GWIS cohort."
+  ]
+}

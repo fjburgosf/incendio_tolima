@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.matplotlib_cache/
+
+# Data, derived products and outputs (not tracked)
+data/
+results/
+figures/
+tables/
+logs/
+figuras español/
+submission_figures/
+
+# Manuscript and documentation (not tracked)
+manuscript/
+docs/
+*.docx
+*.pdf
+
+# Credentials
+.env
+.cdsapirc
+*.token
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

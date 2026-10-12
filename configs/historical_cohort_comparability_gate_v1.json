@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "created": "2026-09-07",
+  "status": "pre-analysis gate, no historical cohort constructed",
+  "purpose": "Define technical eligibility checks before downloading or analysing a multiyear GWIS cohort.",
+  "primary_geography": "Tolima, defined by the existing Cortolima municipal boundary union",
+  "candidate_regional_context_rule": {
+    "definition": "First-order administrative neighbours that share a nonzero boundary segment with Tolima in geoBoundaries COL ADM1.",
+    "candidates": [
+      "Caldas",
+      "Cauca",
+      "Cundinamarca",
+      "Huila",
+      "Quindio",
+      "Risaralda",
+      "Valle del Cauca"
+    ],
+    "interpretation_limit": "Adjacency creates a deterministic context set. It does not establish environmental comparability or authorize pooled inference."
+  },
+  "candidate_seasons": [2018, 2020, 2022, 2024, 2025, 2026],
+  "candidate_month": "August",
+  "required_source_checks": {
+    "gwis_event_schema": {
+      "required_fields": ["area", "finaldate", "fire_id", "id", "initialdate"],
+      "all_seasons_must_have_identical_field_set": true,
+      "same_event_property_conflicts_allowed": 0,
+      "geometry_area_relative_difference_maximum": 0.02,
+      "event_must_intersect_target_geometry": true,
+      "reported_area_must_be_positive": true
+    },
+    "gwis_temporal_follow_up": {
+      "required_query_window": "August 1 through September 15 for every completed historic season",
+      "reason": "Detect whether August-only requests truncate final dates and define a common observation window.",
+      "current_2026_status": "not eligible for this test until September 15 has passed and the service response is audited",
+      "pre_execution_protocol": {
+        "completed_historic_seasons": [2018, 2020, 2022, 2024, 2025],
+        "same_spatial_tiles_as_august_probe": true,
+        "event_identifier": "fire_id, with id only when fire_id is absent",
+        "target_event_reconstruction": "deduplicate tiled geometries then retain only events intersecting the Tolima boundary union",
+        "required_diagnostics": ["all August-probe Tolima events reappear in the follow-up request", "initial and final dates are compared as returned strings", "follow-up events beginning after August are counted but never added to the August event set", "events ending after September 15 are counted before any later cohort decision"],
+        "interpretation_limit": "The audit tests request-window stability and right-censoring risk. It does not establish event completeness, equal detection sensitivity, or authorise multiyear modelling."
+      }
+    },
+    "era5_land": {
+      "required_variables": ["2m_temperature", "2m_dewpoint_temperature", "10m_u_component_of_wind", "10m_v_component_of_wind"],
+      "required_common_grid": true,
+      "required_common_valid_times": true,
+      "precipitation": "blocked pending correct interpretation of accumulated GRIB values"
+    },
+    "independent_or_partially_independent_measurement": {
+      "candidate_products": ["MCD64A1 version 061", "VNP64A1 version 002", "Sentinel 2 L2A"],
+      "required_before_validation_claim": "download, inspect raster layers and quality flags, then specify spatial and temporal agreement criteria before comparison",
+      "current_status": "catalogue availability only for 2018 to 2025, no suitable August 2026 granule in CMR"
+    }
+  },
+  "prohibited_actions": [
+    "Mix FIRMS Standard Processing historical detections with August 2026 NRT detections as one homogeneous series.",
+    "Treat GWIS or FIRMS detections as independent validation of one another.",
+    "Use an August-only request as proof of final event duration without a common follow-up audit.",
+    "Pool neighbouring departments or call them comparable before an explicit comparability assessment.",
+    "Use precipitation before the ERA5 accumulation diagnostic is resolved."
+  ],
+  "decision_rule": "Only after every required technical check is documented may the investigator review a proposed cohort definition and decide whether to authorise multiyear descriptive or associational analysis."
+}

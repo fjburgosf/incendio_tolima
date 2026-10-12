@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "created": "2026-09-10",
+  "status": "frozen before constructing cells, controls or fitting a spatial model",
+  "inference": "associational case control analysis of satellite detected thermal activity in August 2026, not causal inference and not a model of ignitions or burned area",
+  "research_question": "Within municipalities of Tolima, were one kilometre cells with at least one VIIRS Suomi NPP NRT thermal detection in August 2026 associated with topographic setting and membership in the UPRA agricultural frontier, compared with cells without a detection?",
+  "outcome": {
+    "source": "data/interim/regional_fire_detections_labelled_v1.csv",
+    "definition": "case cell is an EPSG 3116 one kilometre cell containing at least one Tolima detection dated 1 through 31 August 2026",
+    "prohibited_interpretations": ["individual fire", "ignition", "burned area", "severity", "cause"]
+  },
+  "eligible_population": {
+    "boundary": "data/raw/boundaries/cortolima_limite_municipal_25k.geojson",
+    "grid": "one kilometre EPSG 3116 cells whose centre is within one of the 47 municipal polygons",
+    "control_definition": "eligible cell with no August 2026 detection",
+    "exclusions": ["cells without a finite DEM sample", "cells not assigned uniquely to one municipality"]
+  },
+  "matching": {
+    "ratio_controls_per_case": 3,
+    "stratum": "one case plus three controls sampled without replacement from the same municipality",
+    "random_seed": 20260910,
+    "selection_rule": "controls are sampled uniformly from eligible non case cells within each case municipality. A control cannot be selected twice.",
+    "failure_rule": "if a municipality has insufficient unique controls for the frozen ratio, retain all available controls and report the reduced ratio without replacement"
+  },
+  "predictors": {
+    "topography": {
+      "source": "Copernicus DEM GLO 90 tiles audited in data/raw/copernicus_dem_glo90_tolima_2026-09-06",
+      "features": ["elevation sampled at cell centroid", "local slope sampled at cell centroid"],
+      "method": "slope is derived from the 90 metre DEM using local latitude adjusted metre spacing at the sampled cell centroid"
+    },
+    "territorial": {
+      "source": "data/interim/upra_agricultural_frontier_tolima.geojson",
+      "feature": "fraction of cell area within the UPRA frontier union",
+      "interpretation_limit": "planning frontier membership is not observed land use, agriculture, human presence or an ignition mechanism"
+    }
+  },
+  "excluded_predictors": {
+    "roads": "INVIAS complete geometry download was blocked. No distance to roads is estimated.",
+    "pixel_land_cover": "The audited MapBiomas product available locally is department annual statistics, not a Tolima raster suitable for cell attribution.",
+    "weather": "A single August spatial case control analysis does not identify dynamic weather effects. Preseason weather is evaluated in the regional temporal panel."
+  },
+  "modelling": {
+    "primary": "conditional logistic regression with matched case control stratum fixed effects and elevation, slope and frontier fraction",
+    "functional_form": "continuous predictors are centred at the median and divided by IQR over the analytic sample. Frontier fraction enters as a continuous proportion.",
+    "nonlinearity_sensitivity": "replace linear elevation with four predeclared elevation quartile indicators. Do not add splines unless diagnostics show a material failure.",
+    "spatial_sensitivity": "repeat after retaining one case per five kilometre cell to reduce local clustering",
+    "prohibited": ["automatic selection", "stepwise selection", "causal attribution", "using controls as confirmed no fire"]
+  },
+  "acceptance_criteria": {
+    "all_cases_have_unique_municipality": true,
+    "all_cases_have_finite_dem": true,
+    "all_controls_are_non_cases": true,
+    "all_strata_have_one_case": true,
+    "all_controls_are_within_case_municipality": true,
+    "no_control_reuse": true,
+    "all_predictors_complete_after_eligibility_filters": true
+  }
+}

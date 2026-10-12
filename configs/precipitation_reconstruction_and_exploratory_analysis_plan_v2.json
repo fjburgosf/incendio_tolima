@@ -1,0 +1,33 @@
+{
+  "version": "2.0",
+  "amends": "precipitation_reconstruction_and_exploratory_analysis_plan_v1.json",
+  "amended_at": "2026-09-08 after execution of the v1 reconstruction and value-semantics diagnostic",
+  "inference_class": "exploratory associational",
+  "retraction": "The v1 direct-value rule is retracted. Its source metadata showed one-hour step ranges, but the values within a common forecast reference cycle increased cumulatively and direct summation produced implausibly large gauge comparisons. The failed v1 output is retained as an audit trail and is prohibited from event models.",
+  "precipitation_reconstruction": {
+    "source": "ERA5 Land total precipitation GRIB records for June 1 through September 1 2026",
+    "accepted_step_rule": "Within every forecast reference cycle, the first step ending at hour one is used directly. Every later step is differenced from the value ending at the preceding step in the same forecast reference cycle. The earliest retained 00 UTC record lacks its prior step in the source window and is omitted.",
+    "negative_rounding_handling": "Differences no smaller than negative 0.0000001 m are set to zero and counted. A smaller value fails the construction gate.",
+    "output_unit": "millimetres after multiplying source metres by 1000",
+    "quality_gates": ["2229 unique hourly validity times from June 1 01:00 through September 1 21:00 UTC", "one-hour continuity", "all within-reference step differences available except the omitted initial boundary record", "no difference below the negative rounding tolerance", "common 989 point grid"]
+  },
+  "gauge_comparison": {
+    "purpose": "Describe agreement between the reconstructed nearest ERA5 Land cell and complete daily IDEAM precipitation gauges.",
+    "stations": "Only stations with complete June through August daily records in the audited local files.",
+    "temporal_alignment": "IDEAM calendar days in America Bogota are totals of ERA5 intervals ending after local midnight and not later than the next local midnight.",
+    "statistics": ["mean signed difference", "mean absolute error", "root mean squared error", "Pearson correlation", "Spearman correlation"],
+    "interpretation_limit": "No bias correction, calibration, validation claim, or event-level error estimate follows from the point-gauge versus grid-cell comparison."
+  },
+  "event_level_exploratory_models": {
+    "cohort": "The existing frozen primary cohort of 59 GWIS events.",
+    "outcomes": ["log_geometry_area_ha", "log1p_detection_interval_hours"],
+    "rainfall_exposures": ["precipitation_first_24h_mm", "precipitation_previous_7_complete_local_days_mm", "maximum_consecutive_dry_days_previous_30_complete_local_days"],
+    "adjustment_set": ["vpd_mean_first_24h_kpa", "wind_mean_first_24h_ms", "anchor_elevation_m"],
+    "model": "One ordinary least squares model with HC3 standard errors for each outcome and one rainfall exposure, with median and IQR scaling of every continuous predictor. Rainfall exposures are never entered together.",
+    "correlation": "Spearman rank correlations between each rainfall exposure and each outcome are reported as unadjusted descriptive checks.",
+    "multiplicity": "Benjamini Hochberg across the six adjusted rainfall-outcome contrasts. Correlations are descriptive and are not used as a significance screen.",
+    "robustness": ["leave-one-event-out direction check", "Huber robust regression direction check", "exclude events whose geometry has less than 95 percent inside Tolima", "exclude events beginning on August 31"],
+    "support_rule": "An exploratory association may be described only if the adjusted HC3 confidence interval excludes zero, Benjamini Hochberg q is below 0.05, and the coefficient direction is stable in every listed robustness check. Otherwise it is inconclusive.",
+    "prohibited_interpretations": ["causation", "ignition mechanism", "physical area burned", "wildfire occurrence", "prediction", "calibration of ERA5 using IDEAM"]
+  }
+}

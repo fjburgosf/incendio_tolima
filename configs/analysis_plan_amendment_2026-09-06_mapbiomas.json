@@ -1,0 +1,22 @@
+{
+  "amendment_version": "1.1",
+  "amends": "analysis_plan_v1.json",
+  "date": "2026-09-06",
+  "timing": "before construction of weather features or estimation of any outcome model",
+  "reason": "The MapBiomas municipal 2024 table has 32 blank class cells. Public source documentation did not define blank-cell semantics. Ten of 47 municipal numeric class totals differ from independently calculated Cortolima municipal areas by more than one percent, with the largest difference close to five percent.",
+  "primary_covariate_change": {
+    "remove": "anchor_municipality_agricultural_fraction_2024",
+    "retain": "anchor_elevation_m"
+  },
+  "mapbiomas_role_after_amendment": "descriptive municipal context only, never a primary exposure or covariate",
+  "unchanged": [
+    "cohort",
+    "outcomes",
+    "weather exposures",
+    "spatial anchor",
+    "model family",
+    "multiplicity family",
+    "robustness requirements"
+  ],
+  "evidence": "results/exploratory/audit_mapbiomas_2024_municipal_context_v1.json"
+}

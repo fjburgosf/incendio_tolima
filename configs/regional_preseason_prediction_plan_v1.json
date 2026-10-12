@@ -1,0 +1,99 @@
+{
+  "version": "1.0",
+  "created": "2026-09-10",
+  "status": "frozen before downloading regional antecedent weather or fitting predictive models",
+  "inference": "predictive out of sample, not causal and not an operational forecast",
+  "research_question": "Could the August 2026 thermal fire activity detected in Tolima have been anticipated from conditions known by 31 July, using prior August seasons in Tolima and seven pre specified neighbouring departments?",
+  "geography": {
+    "departments": ["Tolima", "Caldas", "Cauca", "Cundinamarca", "Huila", "Quindio", "Risaralda", "Valle del Cauca"],
+    "boundary_source": "data/raw/boundaries/geoBoundaries-COL-ADM1.geojson",
+    "screening_bbox_north_west_south_east": [5.9, -78.0, 0.9, -73.0]
+  },
+  "temporal_design": {
+    "outcome_month": "August",
+    "seasons": [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
+    "preseason_cutoff": "31 July of outcome season",
+    "final_holdout_season": 2026,
+    "historical_validation": "leave one complete standard processing season out from 2012 through 2025. The training set for each historical fold contains only the remaining standard processing seasons and never includes 2026. All eight departments of the held out season remain together."
+  },
+  "outcomes": {
+    "primary": "VIIRS Suomi NPP total August detections assigned by point containment to department",
+    "secondary": "number of one kilometre cells with at least one VIIRS Suomi NPP August detection",
+    "sensitivity": "VIIRS Suomi NPP nominal or high confidence August detections",
+    "prohibited_interpretations": ["individual fire", "burned area", "ignition", "cause", "severity"]
+  },
+  "preseason_predictor_blocks": {
+    "antecedent_moisture": {
+      "source": "CHIRPS v3 monthly global cloud optimised GeoTIFF",
+      "variables": ["monthly precipitation"],
+      "coverage": "May through July of each outcome season from 2012 through 2026",
+      "candidate_features": ["July precipitation total", "May through July precipitation total"],
+      "primary_representative": "May through July precipitation total",
+      "sensitivity_representative": "July precipitation total",
+      "rule": "monthly precipitation values are spatially aggregated by department from pixel centres and all source months end no later than July"
+    },
+    "fuel_and_landscape": {
+      "source": "MapBiomas Colombia collection 3 departmental annual statistics",
+      "features": ["fraction agricultural area", "fraction natural non forest vegetation", "fraction forest formation"],
+      "temporal_rule": "use year t minus 1 for outcome year t. For 2025 and 2026 carry 2024 and flag the carry forward"
+    },
+    "department_baseline": {
+      "source": "pre specified department identities and geodesic area from GeoBoundaries",
+      "features": ["department fixed effect"],
+      "purpose": "account for time invariant spatial differences in detection opportunity and landscape extent. A log area offset is deliberately excluded because it is exactly collinear with a full set of department fixed effects."
+    }
+  },
+  "diagnostic_only_predictors": {
+    "source": "ERA5 Land August atmospheric danger metrics",
+    "features": ["mean daily maximum VPD", "mean afternoon VPD", "mean daily VPD"],
+    "rule": "excluded from anticipation models because they are not fully known by 31 July"
+  },
+  "modelling": {
+    "baseline": "department historical mean calculated within each training set",
+    "primary_candidate": "negative binomial count model with department fixed effects",
+    "fallback": "Poisson count model with season clustered robust variance if negative binomial estimation is not stable",
+    "maximum_time_varying_predictors": 3,
+    "selection_rule": "no automatic selection, no selection by significance and one representative per correlated physical block",
+    "diagnostics": ["zero frequency", "overdispersion", "residual by department", "residual by season", "correlation matrix", "variance inflation factors", "prediction calibration"]
+  },
+  "frozen_model_set_2026_09_10": {
+    "selection_status": "fixed after predictor collinearity diagnosis and before any predictive model fitting or performance result",
+    "baseline": "within training set department historical mean",
+    "primary": "negative binomial count model with May through July CHIRPS precipitation, lagged agricultural fraction and department fixed effects",
+    "fallback": "Poisson count model with the same terms only if the negative binomial model fails a documented convergence or stability check",
+    "physical_sensitivity": "replace May through July precipitation with July precipitation, never include both because their Pearson correlation is 0.814 in the assembled panel",
+    "coverage_sensitivity": "replace lagged agricultural fraction with lagged natural non forest fraction, never include forest and agricultural fractions together because their Pearson correlation is minus 0.934 in the assembled panel",
+    "coverage_basis_reason": "agricultural fraction is the primary territorial proxy because it is directly interpretable as managed land extent. It is a predictive feature and not evidence that agriculture caused any ignition.",
+    "scaling_rule": "within every training fold, continuous time varying predictors are centred on the training median and divided by the training interquartile range. Held out rows use the corresponding training constants."
+  },
+  "evaluation": {
+    "metrics": ["mean absolute error", "root mean squared error", "mean absolute log count error", "observed to predicted ratio", "calibration by held out season"],
+    "required_comparison": "all expanded models must be compared with the within training set department historical mean baseline",
+    "2026_reporting": "report prediction trained on 2012 through 2025, uncertainty interval if estimable, and position in the distribution of leave one season out historical errors"
+  },
+  "falsification_checks": [
+    "repeat primary outcome using nominal or high confidence detections",
+    "repeat after excluding Cundinamarca because standard processing type labels show a higher non vegetation fraction",
+    "compare all eight departments in 2026 to assess whether processing level change creates a regional shift",
+    "repeat using precipitation rather than July soil water as antecedent moisture representative",
+    "repeat without 2025 and 2026 carried forward land cover values",
+    "re execute after August 2026 standard processing is available"
+  ],
+  "interpretation_limits": [
+    "A good model would predict satellite detected activity, not physical fire occurrence or damage.",
+    "A predictive association does not identify ignition cause or a causal effect of rainfall, soil moisture or land cover.",
+    "The time almost real versus standard processing difference remains a measurement limitation until direct calibration is possible."
+  ],
+  "technical_amendment_2026_09_10": {
+    "change": "The raw antecedent retrieval is restricted from December 2011 through July 2026 to May through July of each outcome season.",
+    "reason": "The frozen candidate features are July mean soil water and precipitation accumulated over 30 or 90 days before 31 July. May through July covers all primary and sensitivity windows. The earlier expanded coverage would consume data outside every pre specified feature.",
+    "timing": "The amendment follows a successful one day access audit and precedes any analytical regional antecedent feature or model result.",
+    "effect_on_inference": "The raw temporal coverage is reduced without changing cutoff, outcome, validation or model rules."
+  },
+  "source_amendment_2026_09_10": {
+    "change": "CHIRPS v3 monthly precipitation replaces ERA5 Land soil water as the antecedent physical predictor in the current regional panel.",
+    "reason": "The ERA5 Land regional one day access audit passed, but a three year request was rejected for size and a complete month did not return data or an error within the predeclared five minute waiting limit. CHIRPS v3 monthly access, GeoTIFF structure and local pixel decoding passed the audit.",
+    "new_features": "July monthly precipitation and the May through July total. The latter is 92 days, not an exact 90 day rolling accumulation, and is named accordingly.",
+    "interpretation_limit": "Precipitation is not treated as a substitute for soil moisture. The study will report that soil moisture could not be included within the available retrieval timeline."
+  }
+}

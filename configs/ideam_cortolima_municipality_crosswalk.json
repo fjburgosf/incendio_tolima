@@ -1,0 +1,20 @@
+{
+  "version": "2026-08-31",
+  "purpose": "Equivalencias verificadas para auditoría de enlace municipal. No asigna valores NA ni identifica eventos individuales.",
+  "normalization": "Mayúsculas sin tildes ni caracteres no alfanuméricos",
+  "mappings": {
+    "ARMERO": {
+      "cortolima_municipality": "ARMERO GUAYABAL",
+      "evidence_url": "https://geoportal.dane.gov.co/descargas/metadatos/descarga_divipola/descargas/pdf/73_Tolima_pocket.pdf",
+      "evidence_note": "La cartilla DIVIPOLA de Tolima incluye Armero Guayabal como municipio."
+    },
+    "SANSEBASTIANDEMARIQUITA": {
+      "cortolima_municipality": "MARIQUITA",
+      "evidence_url": "https://geoportal.dane.gov.co/descargas/metadatos/descarga_divipola/descargas/pdf/73_Tolima_pocket.pdf",
+      "evidence_note": "La cartilla DIVIPOLA de Tolima denomina al municipio San Sebastián de Mariquita y el límite Cortolima usa Mariquita."
+    }
+  },
+  "unmapped_values": [
+    "NA"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "version": "1.0",
+  "created": "2026-09-07",
+  "status": "pre-analysis pixel-quality and cross-product concordance plan",
+  "scope": {
+    "products": ["MCD64A1 version 061", "VNP64A1 version 002"],
+    "years": [2018, 2020, 2022, 2024, 2025],
+    "target_month": "August",
+    "target_tile": "h10v08",
+    "target_geography": "Tolima, only after an audited transformation from product sinusoidal coordinates",
+    "target_clip_rule": "A raster cell is assigned to Tolima when its native sinusoidal cell centre lies within the union of the municipal Tolima boundary transformed from WGS 84 to the product native sinusoidal coordinate reference system. Boundary-centre ties are excluded by this point-in-polygon rule.",
+    "cell_area_rule": "Only after matching tile dimensions and projected metre extents are verified, native cell area is calculated as absolute horizontal cell width times vertical cell height in square metres. Reported hectares are this native grid-cell area times the retained cell count divided by 10000.",
+    "projection_validity_repair_rule": "If transformation of the valid Tolima union produces a topologically invalid native geometry, make the transformed geometry valid, retain only its polygonal components, dissolve them, and proceed only when the repaired geometry is valid and its relative area difference from the pre-repair transformed geometry is at most 0.0000000001. Record the repair and measured difference."
+  },
+  "official_documentation": {
+    "mcd64a1_user_guide": "https://lpdaac.usgs.gov/documents/1006/MCD64_User_Guide_V61.pdf",
+    "vnp64a1_user_guide": "https://lpdaac.usgs.gov/documents/2124/VNP64_User_Guide_v1.1.pdf"
+  },
+  "burn_date_interpretation": {
+    "burned": "Burn Date from 1 through 366",
+    "unburned_land": "Burn Date equals 0",
+    "unmapped": "Burn Date equals negative 1",
+    "water": "Burn Date equals negative 2"
+  },
+  "primary_pixel_mask": {
+    "require_burn_date_positive": true,
+    "require_qa_land_bit_0_equal_1": true,
+    "require_qa_valid_data_bit_1_equal_1": true,
+    "shortened_mapping_period_bit_2": "retain in primary analysis and report its prevalence"
+  },
+  "predefined_sensitivity": {
+    "exclude_shortened_mapping_period_bit_2_equal_1": true,
+    "purpose": "Assess whether incomplete monthly temporal support changes cross-product concordance."
+  },
+  "required_technical_checks_before_any_spatial_overlay": [
+    "Both products must expose all five expected HDF layers.",
+    "The product tile identifier, dimensions and sinusoidal-grid metadata must be consistent with the filename.",
+    "The spatial transformation must be validated by placing the h10v08 footprint over Tolima before pixel clipping.",
+    "No pixel-area statistic may be reported until the coordinate reference system and cell-area method are documented."
+  ],
+  "cross_product_descriptive_metrics": {
+    "spatial": "Jaccard overlap of primary burned-pixel masks inside Tolima, accompanied by each product-specific burned-pixel count.",
+    "temporal": "Among pixels burned by both products, report exact ordinal-day agreement and agreement when absolute difference does not exceed the sum of both reported Burn Date Uncertainty values.",
+    "execution_rule": "For each common year, compare only the two primary masks after verifying an identical native grid and identical Tolima centre-in-polygon mask. The spatial denominator is the union of the two primary masks. The temporal denominator is their intersection. Repeat both measures after excluding pixels with shortened mapping-period bit 2 from either product. Report null rather than a percentage when the relevant denominator is zero.",
+    "language_limit": "Describe this as cross-product concordance. Do not call either product ground truth or independent validation."
+  },
+  "prohibited_actions": [
+    "Treat zero, negative 1 or negative 2 Burn Date values as burned.",
+    "Choose a QA mask after inspecting concordance results.",
+    "Call MCD64A1 and VNP64A1 independent ground truth for GWIS.",
+    "Use the historical raster results to infer the availability or quality of August 2026, which is not yet present in CMR."
+  ]
+}

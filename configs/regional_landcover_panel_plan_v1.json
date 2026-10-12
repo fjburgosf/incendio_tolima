@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "created": "2026-09-09",
+  "status": "criterios congelados antes de ejecutar el script 147",
+  "purpose": "Construir el panel de cobertura por departamento y por año para Tolima y sus siete vecinos de primer orden, como bloque de combustible del modelo predictivo de panel.",
+  "source": {
+    "file": "data/raw/mapbiomas/mapbiomas_colombia_collection3_coverage_statistics.zip",
+    "member": "Statistics-for-Website-MB-Cobertura-col3.xlsx",
+    "sheet": "COBERTURA_DEPARTAMENTO",
+    "aggregation_level": "class_level_1",
+    "declared_unit": "hectáreas, por verificar contra un límite independiente"
+  },
+  "independent_boundary": {
+    "file": "data/raw/boundaries/geoBoundaries-COL-ADM1.geojson",
+    "area_method": "área geodésica con elipsoide WGS84",
+    "note": "El límite proviene de una fuente distinta a la usada por MapBiomas, de modo que la tolerancia de conciliación es más amplia que la aplicada dentro de una misma fuente."
+  },
+  "target_departments": [
+    "Tolima",
+    "Caldas",
+    "Cauca",
+    "Cundinamarca",
+    "Huila",
+    "Quindio",
+    "Risaralda",
+    "Valle del Cauca"
+  ],
+  "acceptance_criteria": {
+    "all_target_departments_present": true,
+    "required_year_range": [1985, 2024],
+    "no_year_missing_within_range": true,
+    "reconciliation_ratio_minimum": 0.97,
+    "reconciliation_ratio_maximum": 1.03,
+    "reconciliation_definition": "suma de las clases de nivel uno del departamento y año dividida por el área geodésica independiente del mismo departamento",
+    "empty_cell_rule": "una celda vacía se registra como ausente y nunca se convierte en cero. El conteo de celdas ausentes se reporta por departamento y por año",
+    "fraction_rule": "las fracciones se calculan sobre el total de clases conciliadas del mismo departamento y año, nunca sobre el área del límite independiente"
+  },
+  "interpretation_limits": [
+    "La colección cubre hasta 2024. Las temporadas 2025 y 2026 no tienen cobertura propia y no se rellenan dentro de este artefacto.",
+    "La cobertura departamental es un agregado y no describe el combustible dentro de un evento ni dentro de una celda.",
+    "Este panel no mide práctica de quema, uso efectivo ni causa de ignición."
+  ]
+}

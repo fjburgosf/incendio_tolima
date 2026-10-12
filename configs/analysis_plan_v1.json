@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "frozen_at": "2026-09-06 before construction of the event analysis table",
+  "inference": "exploratory associational",
+  "cohort": {
+    "primary": {
+      "gwis_initial_local_start": "2026-08-01T00:00:00-05:00",
+      "gwis_initial_local_end": "2026-08-31T23:59:59-05:00",
+      "requires_at_least_one_tolima_compatible_heat_detection": true,
+      "requires_valid_positive_geometry_area": true,
+      "requires_complete_primary_weather_window": true
+    },
+    "expected_before_execution": 59,
+    "not_asserted_until_built": true,
+    "sensitivity_include_pre_august_active_events": true,
+    "excluded_border_event": "15556230"
+  },
+  "time": {
+    "gwis_datetime_interpretation": "UTC based on matching with heat detections converted from Colombia local time",
+    "local_timezone": "America/Bogota",
+    "primary_weather_validity_times": "24 hourly validity times strictly after GWIS initial time and not later than initial time plus 24 hours",
+    "antecedent_days": "complete local calendar days before the local initial date"
+  },
+  "spatial_anchor": {
+    "rule": "centroid of all compatible national heat detections at the earliest timestamp inside the event geometry and GWIS interval",
+    "weather_sampling": "bilinear interpolation on the regular ERA5 Land grid",
+    "elevation_sampling": "nearest valid Copernicus DEM GLO 90 pixel centre",
+    "coverage_context": "MapBiomas 2024 agricultural fraction in the municipality containing the anchor",
+    "prohibited_primary_anchor": "centroid or areal average of the final GWIS polygon"
+  },
+  "outcomes": {
+    "log_geometry_area_ha": "natural logarithm of complete reconstructed GWIS geometry area in hectares",
+    "log1p_detection_interval_hours": "natural logarithm of GWIS final minus initial hours plus one"
+  },
+  "primary_exposures": {
+    "vpd_mean_first_24h_kpa": "mean vapour pressure deficit over the primary window",
+    "wind_mean_first_24h_ms": "mean 10 metre wind speed over the primary window"
+  },
+  "primary_covariates": {
+    "anchor_elevation_m": "Copernicus DEM GLO 90 digital surface elevation at the anchor",
+    "anchor_municipality_agricultural_fraction_2024": "MapBiomas level 1 agricultural area divided by all classified area"
+  },
+  "derivations": {
+    "temperature_c": "temperature_k minus 273.15",
+    "vapour_pressure_kpa": "0.6108 multiplied by exp of 17.27 T divided by T plus 237.3",
+    "vpd_kpa": "saturation vapour pressure at temperature minus vapour pressure at dewpoint",
+    "vpd_negative_tolerance_kpa": -0.005,
+    "wind_speed_ms": "square root of u10 squared plus v10 squared",
+    "precipitation_mm": "hourly total precipitation in metres multiplied by 1000",
+    "dry_day_threshold_mm": 1.0
+  },
+  "exploratory_exposures": [
+    "temperature mean first 24 hours replacing VPD",
+    "temperature maximum first 24 hours replacing VPD",
+    "precipitation first 24 hours",
+    "precipitation during seven complete antecedent local days",
+    "maximum consecutive dry days during thirty complete antecedent local days"
+  ],
+  "model": {
+    "family": "ordinary least squares on each transformed outcome",
+    "standardization": "subtract median and divide by interquartile range",
+    "standard_errors": "HC3",
+    "confidence_level": 0.95,
+    "tests": "two sided",
+    "vif_joint_model_threshold": 5.0,
+    "missing_stop_threshold_fraction": 0.05,
+    "minimum_n_full_model": 50,
+    "minimum_n_reduced_model": 40
+  },
+  "multiplicity": {
+    "primary_family": [
+      "VPD with log area",
+      "wind with log area",
+      "VPD with log1p interval",
+      "wind with log1p interval"
+    ],
+    "method": "Benjamini Hochberg",
+    "q_threshold": 0.05,
+    "exploratory_family_separate": true
+  },
+  "support_rule": {
+    "positive_prespecified_direction": true,
+    "confidence_interval_excludes_zero": true,
+    "q_below_threshold": true,
+    "direction_stable_in_mandatory_sensitivities": true,
+    "no_single_observation_reverses_direction": true,
+    "otherwise": "inconclusive or refuted, never accepted"
+  },
+  "prohibited": [
+    "causal language",
+    "occurrence or risk model",
+    "machine learning",
+    "stepwise or p value based selection",
+    "municipality fixed effects or multilevel model",
+    "weather by coverage interactions",
+    "simultaneous temperature and VPD in the primary model",
+    "FIRMS count or FRP as a covariate of GWIS area",
+    "deletion of influential observations without a demonstrated data error"
+  ]
+}

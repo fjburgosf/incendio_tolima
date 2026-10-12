@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "frozen_at": "2026-09-08 after GRIB step-structure diagnostic and before rainfall reconstruction or rainfall-event modelling",
+  "inference_class": "exploratory associational",
+  "precipitation_reconstruction": {
+    "source": "ERA5 Land total precipitation GRIB records for June 1 through September 1 2026",
+    "accepted_step_rule": "Each GRIB record is used directly as one hourly precipitation interval only if stepType is accum, the stepRange width is exactly one hour, each validity time is unique, and hourly validity times are continuous. The value at validity time t represents the interval ending at t.",
+    "rejected_rule": "Subtracting adjacent step values is rejected for these files because every GRIB record explicitly has a one-hour step range. The failed subtraction diagnostic is retained as a corrected implementation path.",
+    "output_unit": "millimetres after multiplying source metres by 1000",
+    "quality_gates": ["2230 unique hourly validity times", "one-hour continuity", "all step widths equal one hour", "no materially negative values", "common 989 point grid"]
+  },
+  "gauge_comparison": {
+    "purpose": "Describe agreement between the reconstructed nearest ERA5 Land cell and complete daily IDEAM precipitation gauges.",
+    "stations": "Only stations with complete June through August daily records in the audited local files.",
+    "temporal_alignment": "IDEAM calendar days in America Bogota are totals of ERA5 intervals ending after local midnight and not later than the next local midnight.",
+    "statistics": ["mean signed difference", "mean absolute error", "root mean squared error", "Pearson correlation", "Spearman correlation"],
+    "interpretation_limit": "No bias correction, calibration, validation claim, or event-level error estimate follows from the point-gauge versus grid-cell comparison."
+  },
+  "event_level_exploratory_models": {
+    "cohort": "The existing frozen primary cohort of 59 GWIS events.",
+    "outcomes": ["log_geometry_area_ha", "log1p_detection_interval_hours"],
+    "rainfall_exposures": ["precipitation_first_24h_mm", "precipitation_previous_7_complete_local_days_mm", "maximum_consecutive_dry_days_previous_30_complete_local_days"],
+    "adjustment_set": ["vpd_mean_first_24h_kpa", "wind_mean_first_24h_ms", "anchor_elevation_m"],
+    "model": "One ordinary least squares model with HC3 standard errors for each outcome and one rainfall exposure, with median and IQR scaling of every continuous predictor. Rainfall exposures are never entered together.",
+    "correlation": "Spearman rank correlations between each rainfall exposure and each outcome are reported as unadjusted descriptive checks.",
+    "multiplicity": "Benjamini Hochberg across the six adjusted rainfall-outcome contrasts. Correlations are descriptive and are not used as a significance screen.",
+    "robustness": ["leave-one-event-out direction check", "Huber robust regression direction check", "exclude events whose geometry has less than 95 percent inside Tolima", "exclude events beginning on August 31"],
+    "support_rule": "An exploratory association may be described only if the adjusted HC3 confidence interval excludes zero, Benjamini Hochberg q is below 0.05, and the coefficient direction is stable in every listed robustness check. Otherwise it is inconclusive.",
+    "prohibited_interpretations": ["causation", "ignition mechanism", "physical area burned", "wildfire occurrence", "prediction", "calibration of ERA5 using IDEAM"]
+  }
+}

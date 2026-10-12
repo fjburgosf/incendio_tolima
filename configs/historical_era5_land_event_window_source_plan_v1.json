@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "created": "2026-09-07",
+  "status": "pre-download source plan, no event features or associations",
+  "purpose": "Retrieve and audit only the meteorological source coverage needed to later construct a fixed initial 24-hour event window for the technically eligible historical GWIS events.",
+  "dataset": "reanalysis-era5-land",
+  "years": [2018, 2020, 2022, 2024, 2025],
+  "variables": ["2m_temperature", "2m_dewpoint_temperature", "10m_u_component_of_wind", "10m_v_component_of_wind"],
+  "excluded_variable": {
+    "name": "total_precipitation",
+    "reason": "Blocked pending the separate accumulated-GRIB diagnostic for the 2026 pilot."
+  },
+  "time_coverage": {
+    "august": "Every hourly valid time from August 1 at 00 UTC through August 31 at 23 UTC",
+    "september_extension": "Every hourly valid time on September 1 at 00 UTC through 23 UTC",
+    "reason": "A fixed 24-hour initial window for a late-August operational event can extend into September 1."
+  },
+  "spatial_request": {
+    "bbox_north_west_south_east": [6.2, -76.2, 2.0, -74.0],
+    "purpose": "Use exactly the existing Tolima screening request extent. No municipal or event aggregation is performed in this step."
+  },
+  "retrieval_partition": {
+    "rule": "Submit one raw file per year and period. The period is either all of August or September 1 only.",
+    "reason": "The otherwise identical combined five-year August request was rejected by the service on 2026-09-07 for exceeding its request-size limit. No raw output was created by that rejected request."
+  },
+  "acceptance_criteria": {
+    "all_year_variable_period_pairs_present": true,
+    "no_duplicate_valid_time_per_year_variable": true,
+    "expected_hour_count_august_per_year_variable": 744,
+    "expected_hour_count_september_extension_per_year_variable": 24,
+    "same_grid_size_across_records": true,
+    "units_expected": {"2t": "K", "2d": "K", "10u": "m s**-1", "10v": "m s**-1"}
+  },
+  "prohibited_actions": [
+    "Derive VPD, relative humidity, wind speed or event summaries during source retrieval.",
+    "Convert UTC to local time without a subsequent documented rule.",
+    "Include total precipitation.",
+    "Fit a historical model or compare seasons before a human-approved research question and analysis plan."
+  ]
+}

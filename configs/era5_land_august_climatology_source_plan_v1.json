@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "frozen_at": "2026-09-08 before climatological source retrieval",
+  "purpose": "Retrieve a common August atmospheric reference for Tolima and its screening grid so that the 2026 episode can be situated against a long meteorological baseline independently of GWIS historical event availability.",
+  "dataset": "reanalysis-era5-land",
+  "years": {"first": 1991, "last": 2025},
+  "month": "08",
+  "variables": ["2m_temperature", "2m_dewpoint_temperature", "10m_u_component_of_wind", "10m_v_component_of_wind"],
+  "excluded_variable": {"name": "total_precipitation", "reason": "ERA5 Land precipitation requires a separately audited accumulation reconstruction and is not part of this atmospheric reference request."},
+  "time_coverage": "Every hourly valid time from August 1 00 UTC through August 31 23 UTC for each year.",
+  "spatial_request": {"bbox_north_west_south_east": [6.2, -76.2, 2.0, -74.0], "rule": "Exactly the established ERA5 Land Tolima screening grid."},
+  "retrieval_partition": {"rule": "One raw GRIB file per year", "reason": "A previous combined five-year request exceeded the service request-size limit. One-year files permit auditable coverage and recovery from a failed request."},
+  "acceptance_criteria": {"year_count": 35, "hour_count_per_variable_year": 744, "common_grid_value_count": 989, "variables": {"2t": "K", "2d": "K", "10u": "m s**-1", "10v": "m s**-1"}, "no_duplicate_or_missing_valid_time": true},
+  "future_comparison_rule": "The climatological baseline and the five GWIS-eligible historical seasons are separate comparators. Seasonal atmospheric ranks and deviations may be reported. Neither permits causal attribution or a homogeneous wildfire occurrence trend.",
+  "prohibited_interpretations": ["Causal attribution", "prediction", "mixing GWIS event counts across years as a calibration target", "using precipitation before a separate climatology retrieval and audit"]
+}
