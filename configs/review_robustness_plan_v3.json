@@ -1,0 +1,47 @@
+{
+  "version": "3.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de ejecutar los scripts 187, 188 y 189 y antes de ver sus resultados",
+  "origin": "tercera revisión simulada del 12 de octubre de 2026. Corrige defectos identificados en los scripts 179 y 181 y añade denominadores de superficie. Todo es posterior y descriptivo",
+  "facts_known_before_freezing": [
+    "FIRMS declara VIIRS_SNPP_SP disponible solo hasta el 30 de junio de 2026 en la consulta del 12 de octubre de 2026",
+    "En el rectángulo de descarga, NOAA-20 y NOAA-21 tienen cero detecciones el 17 de agosto de 2026, igual que S-NPP, y entre 0 y 3 detecciones el 3, el 5 y el 6 de agosto"
+  ],
+  "K_missing_days_v2": {
+    "classification": {
+      "documented_outage": ["2026-08-03", "2026-08-05", "2026-08-06"],
+      "caution_with_data": ["2026-08-04"],
+      "valid_zero_day": ["2026-08-17"],
+      "rule_for_valid_zero": "un día se trata como observado con cero detecciones si NOAA-20 y NOAA-21 también registran cero detecciones en Tolima"
+    },
+    "imputation": "detecciones S-NPP faltantes de Tolima en los días de interrupción documentada iguales a la media de NOAA-20 y NOAA-21 en Tolima ese día multiplicada por la razón entre S-NPP y la media de NOAA-20 y NOAA-21 en Tolima en los demás días de agosto de 2026 sin cautela",
+    "assignment": "inclusión de punto en el polígono de Tolima de geoBoundaries, la misma fuente de la serie regional",
+    "common_days": "se excluyen de todas las temporadas solo los días 3 a 6 de agosto",
+    "dropped_metric": "la tasa por día con al menos una detección regional se retira, porque su denominador no mide la disponibilidad orbital",
+    "report": "rango de 2026 entre las 15 temporadas en cada escenario"
+  },
+  "L_area_denominators": {
+    "sample": "50000 puntos aleatorios con semilla 20261014 dentro del polígono de Tolima de los límites municipales de CORTOLIMA, clasificados con el mapa MapBiomas del año anterior a cada temporada",
+    "edge": "mismo criterio del script 179, ventana de 13 por 13 píxeles con al menos 10 por ciento de bosque y 10 por ciento de mosaico agropecuario, aplicado a los puntos de bosque",
+    "elevation": "Copernicus DEM GLO-90 en los puntos de bosque, umbral de 1000 m",
+    "rate_ratios": {
+      "edge": "(detecciones en bosque de borde dividido por fracción del bosque que es borde) sobre (detecciones en bosque interior dividido por fracción del bosque que es interior)",
+      "low_elevation": "(detecciones en bosque bajo 1000 m dividido por fracción del bosque bajo 1000 m) sobre (detecciones en bosque sobre 1000 m dividido por fracción del bosque sobre 1000 m)",
+      "natural_cover": "razón de selección de la cobertura natural, bosque más formación natural no boscosa"
+    },
+    "report": "razones por temporada, posición de 2026 frente a 2012 a 2025 y correlación de Spearman entre la razón de selección natural y las detecciones de la temporada, con y sin 2019"
+  },
+  "M_spatial_dependence": {
+    "blocks": "bloques de 10 km por 10 km sobre las coordenadas proyectadas del centro de cada caso. Cada estrato pertenece al bloque de su caso",
+    "method": "bootstrap de bloques con 1000 réplicas y semilla 20261015 para la regresión logística condicional principal y la ajustada por cobertura natural. Intervalo percentil del 95 por ciento de la razón de odds",
+    "also_report": "la sensibilidad preexistente de un caso por bloque de 5 km del script 163"
+  },
+  "N_sentinel2_v2": {
+    "dates": "fechas explícitas elegidas con la API de catálogo de Copernicus Data Space Ecosystem. Previa, la escena con menor nubosidad declarada entre el 1 de julio de 2026 y el día anterior a la primera detección de la celda. Posterior, la de menor nubosidad entre el día siguiente a la última detección de la celda y el 30 de septiembre de 2026. Se reportan las fechas y el intervalo entre ellas",
+    "footprint": "unión de cuadros de 375 m centrados en cada detección de bosque de la celda, en lugar del cuadro centrado en la media",
+    "reference": "solo píxeles de bosque del mapa MapBiomas 2024 a más de 500 m de toda detección de la celda dentro del cuadro de 1500 m",
+    "evaluable_rule": "al menos 80 por ciento de píxeles útiles en la huella, al menos 10 píxeles útiles de bosque en la huella y al menos 30 píxeles útiles de bosque en la referencia",
+    "corroboration_rule": "la misma del plan forestal, mediana de dNBR del bosque en la huella de al menos 0.10 y superior en al menos 0.10 a la del bosque de referencia",
+    "status": "la versión 1 del script 181 queda como antecedente y se reporta la versión 2"
+  }
+}
