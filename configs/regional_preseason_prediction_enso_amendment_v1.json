@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "amends": "configs/regional_preseason_prediction_plan_v1.json, sin modificar ese archivo",
+  "status": "criterios congelados antes de ajustar cualquier modelo con un índice ENSO",
+  "inference": "predictiva fuera de muestra, no causal",
+  "disclosure": "Enmienda posterior. Una revisión del 12 de octubre de 2026 calculó fuera del pipeline una correlación de Spearman de 0.842 entre el ONI de junio a agosto y las detecciones de agosto en Tolima de 2012 a 2025. La enmienda se formula después de conocer esa asociación y todo su resultado se declara exploratorio.",
+  "index": {
+    "primary": {
+      "name": "ONI",
+      "season": "MJJ del año de la temporada",
+      "source": "NOAA CPC, https://www.cpc.ncep.noaa.gov/data/indices/oni.ascii.txt, columna ANOM",
+      "reason": "mayo a julio coincide con la ventana de precipitación antecedente y su información termina el 31 de julio. JJA incluye agosto y queda prohibido en los modelos de anticipación"
+    },
+    "sensitivity": [
+      {"name": "RONI", "season": "MJJ", "source": "NOAA CPC, tabla de la página https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/"},
+      {"name": "ONI", "season": "AMJ", "reason": "publicado antes de agosto, sin depender de la fecha de publicación del valor MJJ"}
+    ],
+    "revision_note": "los valores se toman de las tablas vigentes al 12 de octubre de 2026. Los valores en tiempo real disponibles el 31 de julio de cada año pudieron ser distintos"
+  },
+  "models": {
+    "common_rules": "misma familia binomial negativa, efectos fijos de departamento, validación dejando una temporada fuera de 2012 a 2025, ajuste final con 2012 a 2025 y predicción de 2026, escalado por mediana y rango intercuartílico del entrenamiento, igual que el script 160. El código reutiliza las funciones del script 160 para que la comparación tenga la misma configuración",
+    "set": {
+      "baseline_department_historical_mean": "sin cambios",
+      "nb_primary_may_july_agricultural": "modelo primario original, reajustado por el mismo código como control de reproducción",
+      "nb_enso_only": "índice ENSO y efectos fijos de departamento",
+      "nb_enso_plus_primary": "índice ENSO, precipitación de mayo a julio, fracción agrícola rezagada y efectos fijos de departamento. Tres predictores variables en el tiempo, el máximo permitido"
+    },
+    "not_allowed": "interacción del índice con departamento, porque 14 temporadas no la sostienen. Selección por significancia"
+  },
+  "reproduction_check": "las predicciones del modelo primario reajustado deben coincidir con results/primary/regional_preseason_prediction_rows_v1.csv con diferencia absoluta máxima de 1e-6. Si no coinciden, el análisis se detiene",
+  "evaluation": {
+    "primary_metric": "error logarítmico absoluto medio agrupado sobre las 112 filas de validación histórica",
+    "secondary": ["error absoluto medio", "raíz del error cuadrático medio", "predicción de Tolima en 2026 y razón observado sobre predicho", "posición del error de Tolima 2026 en la distribución de errores de Tolima de la validación histórica", "suma de los ocho departamentos en 2026"],
+    "improvement_rule": "un modelo con ENSO mejora la anticipación solo si su error primario es menor que el del modelo primario original y que el de la línea base",
+    "extrapolation_flag": "se reporta si el valor del índice en 2026 supera el máximo de 2012 a 2025",
+    "collinearity": "correlación de Pearson entre el índice y la precipitación de mayo a julio por departamento en 2012 a 2025"
+  },
+  "descriptive_association": {
+    "test": "Spearman entre el índice y las detecciones de agosto de cada departamento en 2012 a 2025, con p exacto o por permutación de 100000 réplicas y semilla fija",
+    "multiplicity": "ocho departamentos por índice primario. Se reportan valores q de Benjamini Hochberg",
+    "label": "exploratorio y posterior"
+  },
+  "interpretation_limits": [
+    "El índice es común a todos los departamentos en cada temporada. Su coeficiente se identifica con 14 temporadas.",
+    "Una mejora predictiva no identifica un mecanismo. La vía física esperada de El Niño en los Andes colombianos es la reducción de lluvia, que ya está parcialmente representada por CHIRPS.",
+    "2026 usa NRT y 2012 a 2025 usan procesamiento estándar."
+  ]
+}

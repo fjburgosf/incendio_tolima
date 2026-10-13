@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de calcular cualquier valor de demanda atmosférica en celdas con fuego y antes de descargar series de estaciones IDEAM",
+  "inference": "descriptiva",
+  "origin": "análisis añadido después de conocer los resultados estacionales, a raíz de la revisión previa al envío del 12 de octubre de 2026. Se declara como verificación posterior y no como análisis prefijado del plan original.",
+  "question": "La posición baja de agosto de 2026 en demanda atmosférica, medida sobre los 198 centros de Tolima, se mantiene cuando la demanda se mide donde ocurre la actividad térmica y cuando se contrasta con estaciones IDEAM.",
+  "part_a_fire_location_reanalysis": {
+    "source": "las mismas series horarias ERA5-Land del script 148, sin descargas nuevas",
+    "metric_convention": "igual al script 148. Serie horaria del promedio espacial ponderado por coseno de la latitud, máximo horario por día UTC y media de los 31 máximos diarios de agosto",
+    "cell_assignment": "cada detección VIIRS Suomi NPP asignada a Tolima se asigna al centro ERA5-Land más cercano entre los 198 retenidos, siempre que la distancia en latitud y en longitud no supere 0.05 grados",
+    "primary_mask": {
+      "name": "fire_prone_reference",
+      "definition": "centros con al menos una detección en las temporadas de referencia 2012 a 2025",
+      "reason": "la máscara se define sin usar 2026, de modo que la temporada evaluada no participa en su propia selección espacial"
+    },
+    "sensitivity_masks": [
+      {"name": "fire_prone_upper_quartile", "definition": "centros de la máscara primaria cuyo conteo de detecciones 2012 a 2025 está en el cuartil superior de esa máscara"},
+      {"name": "detection_weighted_same_season", "definition": "ponderación por el número de detecciones de cada centro en la misma temporada. Solo existe para 2012 a 2026 y se posiciona contra 2012 a 2025"}
+    ],
+    "positioning": {
+      "reference_long": "1991 a 2025, 35 temporadas",
+      "reference_short": "2012 a 2025, 14 temporadas",
+      "statistics": ["rango", "percentil empírico", "puntuación z robusta con mediana y 1.4826 por la desviación absoluta mediana"]
+    },
+    "daily_threshold": "percentil 90 de los máximos diarios de la máscara primaria sobre 2012 a 2025, igual criterio que el script 168, y conteo de días de 2026 por encima",
+    "decision_rule": {
+      "confirms_low_demand": "percentil empírico de 2026 en la máscara primaria frente a 1991 a 2025 menor o igual a 33.3",
+      "contradicts": "percentil empírico mayor o igual a 66.7",
+      "intermediate": "entre ambos valores. El texto debe decir que en las celdas con fuego 2026 fue típico y no bajo"
+    }
+  },
+  "part_b_ideam_stations": {
+    "source": "datos abiertos IDEAM en datos.gov.co, conjuntos sbwg-7ju4 temperatura ambiente del aire y uext-mhny humedad del aire, consultados por API pública sin credenciales",
+    "known_coverage_before_analysis": "consulta de disponibilidad del 12 de octubre de 2026. Para Tolima hay registros hasta el 24 de julio de 2026 bajo la etiqueta TOLIMA y desde el 12 de agosto de 2026 bajo la etiqueta Tolima. Del 1 al 11 de agosto de 2026 no hay datos.",
+    "window": "12 a 31 de agosto, en hora local, igual para todos los años",
+    "station_inclusion": "estación de Tolima con temperatura y humedad en la ventana de 2026 con al menos 80 por ciento de horas pareadas, y con al menos 5 años de referencia entre 2012 y 2025 que cumplan el mismo 80 por ciento",
+    "processing": {
+      "time_zone": "se asume hora local de Colombia, UTC menos 5. Se comprueba con la hora mediana del máximo diario de temperatura, que debe caer entre las 11 y las 16 horas locales. Si no se cumple, el análisis se detiene",
+      "hourly": "promedio de las observaciones de cada estación y hora para temperatura y humedad por separado, y pareo exacto por estación y hora",
+      "quality_control": "temperatura entre menos 5 y 45 grados Celsius, humedad mayor que 0 y hasta 100 por ciento. Valores fuera de rango se descartan y se cuentan",
+      "vpd": "presión de saturación de Tetens con los mismos coeficientes del script 148, multiplicada por uno menos la humedad relativa sobre 100",
+      "day_valid": "día con al menos 18 horas pareadas"
+    },
+    "metrics": {
+      "station": "media de los máximos diarios de déficit de presión de vapor en la ventana",
+      "positioning": "percentil empírico de 2026 entre los años de referencia de la propia estación",
+      "network": "mediana de los percentiles y número de estaciones en el tercil inferior, medio y superior"
+    },
+    "reanalysis_counterpart": "centro ERA5-Land más cercano a cada estación entre los 989 de la cuadrícula, convertido a hora local, misma ventana, mismos días válidos de la estación, para los años en que existe ERA5-Land del script 148. Se reportan el percentil de 2026 en ERA5-Land con la misma referencia de años y la correlación de Pearson diaria de 2026 entre estación y reanálisis",
+    "decision_rule": {
+      "confirms_low_demand": "mediana de los percentiles de estación menor o igual a 33.3",
+      "contradicts": "mediana mayor o igual a 66.7",
+      "intermediate": "entre ambos valores"
+    },
+    "limits": [
+      "La ventana excluye del 1 al 11 de agosto, que incluye días de actividad térmica alta. La comparación no cubre el mes completo.",
+      "Las estaciones son puntuales y su ubicación no fue elegida para representar las celdas con fuego.",
+      "Los datos crudos de estaciones automáticas no tienen control de calidad oficial."
+    ]
+  },
+  "prohibited": ["lenguaje causal", "periodo de retorno", "cambiar el umbral o la máscara después de ver el resultado"]
+}

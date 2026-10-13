@@ -1,0 +1,52 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de ejecutar los scripts 179 y 180 y antes de ver cualquiera de sus resultados",
+  "origin": "revisión simulada previa al envío del 12 de octubre de 2026. Todos los análisis son de robustez o de incertidumbre y se declaran posteriores",
+  "A_viirs_ranking_robustness": {
+    "question": "Depende la posición de 2026 como segunda temporada más activa de Tolima de los días sin observación o del nivel de procesamiento",
+    "scenarios": {
+      "observed": "conteo de detecciones de agosto tal como se descargó",
+      "common_days": "se excluyen de todas las temporadas los días 3, 4, 5, 6 y 17 de agosto, que en 2026 no tuvieron observación o quedaron en el periodo de cautela",
+      "imputed_mean": "los días 3, 5, 6 y 17 de 2026 se imputan con la media diaria de Tolima en los demás días de 2026 sin cautela",
+      "imputed_max": "los mismos días se imputan con el máximo diario de Tolima en 2026, cota superior",
+      "nominal_high_confidence": "solo detecciones de confianza nominal o alta",
+      "per_observed_day": "detecciones de Tolima divididas por los días de agosto con al menos una detección en los ocho departamentos",
+      "cells": "celdas de 1 km con al menos una detección"
+    },
+    "statistic": "rango descendente de 2026 entre las 15 temporadas en cada escenario",
+    "decision_rule": "la frase segunda temporada más activa se mantiene si 2026 ocupa el segundo lugar en todos los escenarios. Si su rango varía, el texto reporta el intervalo de rangos"
+  },
+  "B_forest_assignment_agreement": {
+    "point_vs_window": "fracción de detecciones cuyo grupo en el píxel difiere del grupo mayoritario de la ventana de 13 por 13 píxeles",
+    "forest_window_support": "fracción de las detecciones de 2026 en píxel de bosque cuya ventana tiene al menos 50 por ciento de bosque",
+    "edge": "detección de borde si su ventana tiene al menos 10 por ciento de formación boscosa y al menos 10 por ciento de mosaico agropecuario. Se reporta la fracción de borde entre las detecciones de 2026 en píxel de bosque"
+  },
+  "C_station_error": {
+    "station": "Nataima, única estación que cumplió el criterio del script 173",
+    "metrics": "sesgo medio, error absoluto medio y raíz del error cuadrático medio del máximo diario de déficit de presión de vapor de ERA5-Land en la celda más cercana frente a la estación, por año, con los mismos días válidos del script 173"
+  },
+  "D_prediction_intervals": {
+    "models": ["nb_primary_may_july_agricultural", "nb_enso_only_oni_mjj", "nb_enso_only_oni_amj"],
+    "method": "simulación paramétrica desde el ajuste final de 2012 a 2025. Coeficientes con distribución normal multivariada de su matriz de covarianza, parámetro de dispersión truncado en valores positivos y conteo binomial negativo con la media simulada",
+    "draws": 20000,
+    "seed": 20261013,
+    "report": "intervalos del 90 por ciento de la media y del conteo de Tolima en 2026, y si 685 cae dentro",
+    "limit": "los intervalos condicionan a la forma del modelo y no incluyen la incertidumbre de extrapolación por fuera del rango del índice"
+  },
+  "E_tolima_concurrent_vs_antecedent": {
+    "question": "La información concurrente de demanda reproduce 2026 por sí sola, y añade algo a la información antecedente",
+    "unit": "temporada de agosto en Tolima, 2012 a 2025, con 2026 retenido",
+    "model": "regresión lineal del logaritmo de las detecciones, con validación dejando una temporada fuera y predicción de 2026 con el ajuste de 2012 a 2025. Máximo dos predictores por catorce temporadas",
+    "specifications": {
+      "null": "solo intercepto",
+      "concurrent_vpd_fire_cells": "DPV máximo diario medio en las celdas con fuego",
+      "antecedent_oni_mjj": "ONI de mayo a julio",
+      "antecedent_rain": "precipitación de mayo a julio de Tolima",
+      "concurrent_plus_oni": "DPV en celdas con fuego y ONI de mayo a julio",
+      "concurrent_plus_rain": "DPV en celdas con fuego y precipitación de mayo a julio"
+    },
+    "metric": "error logarítmico absoluto medio de la validación y predicción de 2026 frente a 685",
+    "interpretation": "descriptiva y retrospectiva. Las especificaciones con DPV no son modelos de anticipación porque el DPV de agosto no se conoce antes de la temporada"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": "2.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de ejecutar los scripts 183, 184 y 185 y antes de ver cualquiera de sus resultados",
+  "origin": "puntos pendientes de la revisión simulada del 12 de octubre de 2026. Todos los análisis son posteriores y descriptivos o retrospectivos",
+  "F_nested_selection": {
+    "question": "Cuánto error comete un procedimiento que elige el modelo regional con los datos disponibles, en lugar de un modelo fijado",
+    "candidates": ["nb_primary_may_july_agricultural", "nb_enso_only_oni_mjj", "nb_enso_only_oni_amj", "nb_enso_only_roni_mjj", "nb_enso_plus_primary_oni_mjj"],
+    "procedure": "para cada temporada externa de 2012 a 2025, cada candidato se valida dejando una temporada fuera dentro de las trece restantes. Se elige el de menor error logarítmico absoluto medio interno, se ajusta con las trece y se predice la temporada externa. Para 2026 la elección usa las catorce temporadas",
+    "report": "error logarítmico externo del procedimiento frente al modelo principal fijo y a la línea base, frecuencia de elección de cada candidato y modelo elegido para 2026 con su predicción de Tolima"
+  },
+  "G_precipitation_windows": {
+    "windows": {"july": "julio", "june_july": "suma de junio y julio", "may_july": "suma de mayo a julio, ventana principal"},
+    "regional": "modelo binomial negativo con la ventana y la fracción agrícola rezagada, igual que el principal",
+    "tolima": "regresión del logaritmo de las detecciones de Tolima con cada ventana, con validación dejando una temporada fuera",
+    "report": "error de validación y predicción de Tolima 2026 por ventana. La ventana principal no cambia"
+  },
+  "H_soil_moisture": {
+    "source": "ERA5-Land promedios mensuales, contenido volumétrico de agua en la capa de 0 a 7 cm (swvl1) y de 7 a 28 cm (swvl2), mayo a julio de 1991 a 2026, recorte de Tolima",
+    "aggregation": "promedio de mayo a julio sobre los 198 centros de Tolima del script 148, ponderado por el coseno de la latitud",
+    "report": "posición de 2026 frente a 1991 a 2025 y 2012 a 2025, correlación de Spearman con el ONI de mayo a julio y con las detecciones de 2012 a 2025, y regresión del logaritmo de las detecciones con validación dejando una temporada fuera",
+    "limit": "humedad del suelo de reanálisis y no humedad del combustible"
+  },
+  "I_oni_coefficient_stability": {
+    "source": "coeficientes escalados del ONI de mayo a julio en las catorce validaciones del script 175",
+    "report": "mínimo, máximo y signo"
+  },
+  "J_cover_adjusted_spatial_model": {
+    "question": "La asociación con la pendiente persiste al considerar la cobertura natural de la celda",
+    "covariate": "fracción de formación boscosa y de formación natural no boscosa en la celda de 1 km según MapBiomas 2024, muestreada en una malla de 11 por 11 puntos",
+    "model": "misma regresión logística condicional del script 163, con elevación, pendiente, frontera agrícola y fracción natural, cada una escalada por su rango intercuartílico",
+    "accessibility": "no se incluye porque la capa vial de INVIAS no pudo descargarse íntegra",
+    "report": "razones de odds e intervalos del 95 por ciento de todos los términos"
+  }
+}

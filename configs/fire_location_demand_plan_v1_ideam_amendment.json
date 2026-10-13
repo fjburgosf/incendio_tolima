@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "amends": "configs/fire_location_demand_plan_v1.json, parte B, sin modificar ese archivo",
+  "status": "enmienda técnica escrita antes de descargar las series horarias y antes de calcular cualquier déficit de estación",
+  "finding_that_motivates_it": "en datos.gov.co el sensor 0027 aparece como Humedad del aire 2 mt hasta el 22 de agosto de 2023 y como HUMEDAD DEL SUELO A 1 m Ó MAS desde el 12 de septiembre de 2023, con el mismo código. La etiqueta posterior puede ser un error de descripción o una variable distinta.",
+  "gate": {
+    "test": "para cada estación y cada año, correlación de Pearson horaria entre temperatura y humedad en la ventana. Una humedad relativa del aire tiene un ciclo diario opuesto al de la temperatura",
+    "rule": "la serie de humedad de una estación y un año se usa solo si esa correlación es menor que menos 0.5 y la mediana de la amplitud diaria de humedad supera 15 puntos porcentuales",
+    "consequence": "si la mayoría de las estaciones falla la prueba en 2026, la parte B se declara no evaluable y no se reporta ningún contraste con estaciones"
+  },
+  "query_rule": "las series se piden por código de estación y fecha, sin filtrar por la etiqueta de departamento, porque los datos de 2026 aparecen bajo TOLIMA y bajo Tolima"
+}

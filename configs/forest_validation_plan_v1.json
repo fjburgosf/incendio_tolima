@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de muestrear altitudes de detecciones en bosque y antes de descargar cualquier imagen Sentinel-2 de las celdas evaluadas",
+  "origin": "pedido del autor de reforzar el foco forestal y recomendación de la revisión simulada del 12 de octubre de 2026. Análisis posterior y descriptivo",
+  "A_forest_elevation": {
+    "unit": "detecciones de Tolima de 2012 a 2026 cuyo píxel MapBiomas del año anterior es formación boscosa",
+    "source": "Copernicus DEM GLO-90, mismas teselas y función de muestreo del script 162",
+    "metrics": "mediana y cuartiles de la altitud por temporada, y fracción por debajo de 1000 m, umbral tomado de Perea Ardila et al. (2024) antes de calcular. Posición de 2026 frente a 2012 a 2025",
+    "comparison": "la misma fracción para todas las detecciones y para la formación boscosa de Tolima no se calcula, porque exigiría un muestreo areal no planeado"
+  },
+  "B_sentinel2_corroboration": {
+    "unit": "celda de 1 km con al menos una detección de 2026 en píxel de formación boscosa. Su centro es la media de las coordenadas de esas detecciones y su fecha la de la primera detección",
+    "imagery": "Sentinel-2 L2A por la API Process de Copernicus Data Space Ecosystem, bandas B08, B12, SCL y dataMask a 20 m, con la función de petición del script 79",
+    "windows": {
+      "pre": "del 1 de julio de 2026 al día anterior a la primera detección de la celda",
+      "post": "del día siguiente a la última detección de 2026 en la celda al 30 de septiembre de 2026",
+      "mosaicking": "leastCC"
+    },
+    "geometry": {
+      "box": "cuadro de 1500 m de lado centrado en la celda",
+      "footprint": "cuadro central de 375 m de lado",
+      "reference": "píxeles del cuadro a más de 500 m del centro"
+    },
+    "usable_pixels": "SCL en 4, 5, 6 o 7 y dataMask igual a 1 en ambas fechas",
+    "forest_pixels": "píxeles Sentinel-2 cuyo centro cae en formación boscosa del mapa MapBiomas de 2024",
+    "evaluable_rule": "al menos 80 por ciento de píxeles útiles en ambas fechas dentro de la huella y al menos 10 píxeles útiles de bosque en la huella",
+    "metric": "dNBR igual a NBR previo menos NBR posterior, con NBR igual a (B08 menos B12) dividido por (B08 más B12)",
+    "corroboration_rule": "celda corroborada si la mediana de dNBR de los píxeles útiles de bosque de la huella es al menos 0.10 y supera en al menos 0.10 a la mediana de dNBR de los píxeles útiles de la referencia",
+    "report": "número de celdas evaluadas, evaluables, corroboradas y no corroboradas. No se relaja ningún umbral después de ver el resultado",
+    "limits": [
+      "El dNBR responde también a cosecha, sequía y cambios fenológicos.",
+      "La nubosidad de la temporada puede dejar muchas celdas no evaluables.",
+      "Una celda no corroborada no prueba ausencia de fuego en el sotobosque."
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "created": "2026-10-12",
+  "status": "criterios congelados antes de descargar los mapas de cobertura y antes de muestrear cualquier detección",
+  "inference": "descriptiva",
+  "origin": "análisis añadido a pedido del autor por el enfoque forestal de la revista destino. Se declara como análisis posterior.",
+  "question": "Sobre qué coberturas previas al fuego cayeron las detecciones VIIRS Suomi NPP de agosto en Tolima, cuánto pesó la formación boscosa en 2026 frente a 2012 a 2025, y qué fracción cayó dentro de áreas protegidas del RUNAP.",
+  "detections": "data/interim/regional_fire_detections_labelled_v1.csv, filas de Tolima, temporadas 2012 a 2026",
+  "cover_source": {
+    "product": "MapBiomas Colombia colección 3, mapa anual de cobertura a 30 metros",
+    "url_pattern": "https://storage.googleapis.com/mapbiomas-public/initiatives/colombia/collection_3/coverage/colombia_coverage_{year}.tif",
+    "integrity": "md5 publicado por el almacenamiento debe coincidir con el archivo descargado",
+    "year_rule": "cobertura del año t menos 1 para la temporada t. 2025 y 2026 usan 2024, último año publicado, y quedan marcadas",
+    "legend": "hoja LEYENDA del archivo oficial de estadísticas de transición de la colección 3, ya descargado"
+  },
+  "groups": {
+    "forest_formation": [3, 5, 6, 49],
+    "natural_non_forest": [11, 12, 13, 29, 32, 50, 81, 82],
+    "forest_plantation": [9],
+    "agricultural_other": [14, 21, 35, 74],
+    "non_vegetated": [22, 23, 24, 25, 30, 68, 75],
+    "water": [26, 31, 33, 34],
+    "not_observed": [0, 27],
+    "note": "la clase 21 es un mosaico de agricultura o pasto. Pastos y cultivos no se separan. Un código ausente de esta lista detiene el análisis"
+  },
+  "sampling": {
+    "primary": "clase del píxel de 30 metros que contiene la coordenada de la detección",
+    "sensitivity": "composición de la ventana de 13 por 13 píxeles centrada en la detección, cerca de 390 metros de lado, comparable con el píxel VIIRS de 375 metros en nadir. Se reporta la fracción media de cada grupo y la fracción de detecciones cuya ventana es al menos 50 por ciento formación boscosa",
+    "crs_check": "el script verifica el sistema de referencia del archivo y se detiene si no es geográfico en grados"
+  },
+  "comparisons": {
+    "season_shares": "fracción de detecciones por grupo en cada temporada",
+    "position_2026": "percentil empírico de la fracción en formación boscosa de 2026 frente a 2012 a 2025, con la misma definición de los scripts 148 y 172",
+    "availability": "fracción del área de Tolima en cada grupo según la hoja COBERTURA_DEPARTAMENTO de las estadísticas oficiales, año 2024 para 2026 y año t menos 1 para el resto",
+    "selection_ratio": "fracción de detecciones en el grupo dividida por la fracción del área de Tolima en el grupo",
+    "municipalities": "municipios con más detecciones en formación boscosa en 2026, a partir de la columna de municipio de la asignación existente si está disponible, o por inclusión en los límites municipales de CORTOLIMA"
+  },
+  "protected_areas": {
+    "source": "data/interim/runap_protected_areas_tolima_exact.geojson, recorte exacto ya auditado del RUNAP descargado el 1 de septiembre de 2026",
+    "metric": "fracción de detecciones dentro de la unión de áreas protegidas por temporada, posición de 2026 frente a 2012 a 2025 y desglose por categoría en 2026",
+    "limit": "se usa la delimitación vigente en 2026 para todos los años"
+  },
+  "interpretation_limits": [
+    "Una detección en un píxel de bosque no demuestra que el bosque se haya quemado. El error de geolocalización y el tamaño del píxel VIIRS superan los 30 metros del mapa.",
+    "La cobertura es previa a la temporada y no incluye cambios del mismo año.",
+    "Ninguna fracción se interpreta como área quemada, severidad o causa."
+  ]
+}
