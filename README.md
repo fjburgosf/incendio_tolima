@@ -29,7 +29,7 @@ Scripts are grouped by numbering.
 | `172`–`175` | Atmospheric demand at fire cells, IDEAM station check, ENSO indices (ONI, RONI) and the ENSO amendment of the regional model |
 | `176`–`178` | MapBiomas annual coverage rasters, prior land cover and protected areas under each detection, supplementary summaries |
 | `179`–`186` | Robustness of the 2026 ranking, forest edges and elevation, Sentinel-2 dNBR corroboration of forest cells, prediction intervals, nested model selection, precipitation windows, ERA5-Land soil moisture and a cover adjusted spatial model |
-| `187`–`190` | Missing days checked against NOAA-20 and NOAA-21, forest edge and elevation detection rates per unit area, spatial block bootstrap, Sentinel-2 corroboration version 2 with explicit dates and a forest reference, the forest figure, and the uncertainty and sensitivity of the forest rate ratios (block bootstrap, alternative edge and elevation thresholds, window majority forest definition and a second Monte Carlo sample) |
+| `187`–`191` | Missing days checked against NOAA-20 and NOAA-21, forest edge and elevation detection rates per unit area, spatial block bootstrap, Sentinel-2 corroboration version 2 with explicit dates and a forest reference, the forest figure, and the uncertainty and sensitivity of the forest rate ratios (block bootstrap, alternative edge and elevation thresholds, window majority forest definition and a second Monte Carlo sample), and the study map in Spanish with Calibri 10 point text at print size |
 
 Most scripts write a JSON audit with input hashes to `results/`. Paths are relative to the repository root, under `data/raw/`, `data/interim/`, `data/processed/`, `results/` and `figures/`.
 
@@ -102,6 +102,7 @@ python scripts/187_review_v3_missing_days_area_rates_blocks.py
 python scripts/188_sentinel2_forest_corroboration_v2.py
 python scripts/190_area_rate_ratio_uncertainty_sensitivity.py
 python scripts/189_generate_forest_figure.py
+python scripts/191_generate_figure1_calibri.py
 ```
 
 These scripts also read raw inputs obtained during the source audits (scripts `01`–`99`), such as MapBiomas statistics, the CORTOLIMA municipal boundaries and the Copernicus DEM GLO-90 tiles. The geoBoundaries ADM1 layer for Colombia is expected at `data/raw/boundaries/geoBoundaries-COL-ADM1.geojson`. Random steps use fixed seeds declared in the scripts or in `configs/`.

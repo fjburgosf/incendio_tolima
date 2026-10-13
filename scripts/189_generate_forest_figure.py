@@ -26,8 +26,8 @@ import matplotlib
 matplotlib.use("Agg")
 locale.setlocale(locale.LC_NUMERIC, "C")
 matplotlib.rcParams["axes.formatter.use_locale"] = False
-matplotlib.rcParams.update({"font.family": "Calibri", "font.size": 9, "axes.titlesize": 9.5, "axes.labelsize": 9,
-                            "xtick.labelsize": 8.5, "ytick.labelsize": 8.5, "legend.fontsize": 8.5})
+matplotlib.rcParams.update({"font.family": "Calibri", "font.size": 10, "axes.titlesize": 10, "axes.labelsize": 10,
+                            "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 10})
 import matplotlib.pyplot as plt
 import numpy as np
 import tifffile
@@ -94,8 +94,8 @@ def main() -> None:
     ax.set_title("(a) Detecciones de 2026 y bosque de 2024", loc="left")
     ax.legend(loc="upper left", frameon=False, markerscale=2.5, handletextpad=0.1, borderpad=0.2, labelspacing=0.2, borderaxespad=0.2)
     ax.set_aspect("equal")
-    ax.set_xlim(west - 0.85, east + 0.05); ax.set_ylim(south - 0.05, north + 0.05)
-    ax.set_xticks([-76.5, -75.5, -74.5])
+    ax.set_xlim(west - 1.25, east + 0.05); ax.set_ylim(south - 0.05, north + 0.05)
+    ax.set_xticks([-77.0, -76.0, -75.0])
 
     ax = axes[0, 1]
     det = [a187[str(s)]["detections"] for s in seasons]
@@ -103,7 +103,7 @@ def main() -> None:
     for s, d, n in zip(seasons, det, nat):
         ax.scatter(d, n, s=40 if s == 2026 else 22, color="#b30000" if s == 2026 else "#4d4d4d", zorder=3)
         if s in (2019, 2026, 2021, 2017):
-            ax.annotate(str(s), (d, n), textcoords="offset points", xytext=(3, 2), fontsize=8)
+            ax.annotate(str(s), (d, n), textcoords="offset points", xytext=(3, 2), fontsize=10)
     ax.set_xlabel("Detecciones de agosto en Tolima")
     ax.set_ylabel("Razón de selección natural")
     ax.set_title("(b) Cobertura natural y actividad", loc="left")
@@ -125,7 +125,8 @@ def main() -> None:
     ax.set_ylabel("Razón de tasas bajo y sobre 1000 m")
     ax.set_xlabel("Temporada (20xx)")
     ax.set_title("(c) Concentración en bosque bajo", loc="left")
-    ax.tick_params(axis="x", labelsize=8)
+    ax.set_xticks(range(0, len(labels), 2), labels[::2])
+    ax.tick_params(axis="x", labelsize=10)
     ax.grid(axis="y", alpha=0.3)
 
     cells = [r for r in csv.DictReader(CELLS188.open(encoding="utf-8")) if r["status"] == "corroborated"]
