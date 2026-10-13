@@ -1,0 +1,36 @@
+{
+  "version": "4.0",
+  "created": "2026-10-13",
+  "status": "criterios congelados antes de ejecutar el script 190 y antes de ver sus resultados",
+  "origin": "cuarta revisión simulada del 13 de octubre de 2026. Cuantifica la incertidumbre y la sensibilidad de las razones de tasas por superficie del script 187. Todo es posterior y descriptivo",
+  "facts_known_before_freezing": [
+    "Script 187, razón de tasas del bosque bajo 1000 m en 2026 igual a 38.98, máximo de 2012 a 2025 igual a 16.22, razón de borde en 2026 igual a 2.50, mínimo de 2012 a 2025 igual a 2.18",
+    "En 2026, 189 detecciones caen en píxel de formación boscosa y 7 en cobertura no vegetada, códigos 23 y 25"
+  ],
+  "base": "los mismos 50000 puntos aleatorios con semilla 20261014 del script 187, el mismo mapa MapBiomas del año anterior a cada temporada y el mismo Copernicus DEM GLO-90",
+  "P_counts": "reportar por temporada los conteos de detecciones en bosque bajo y sobre 1000 m, en borde y en interior, y las fracciones de superficie de cada estrato con su error estándar binomial del muestreo de puntos",
+  "Q_uncertainty_2026": {
+    "exact": "intervalo de 95 por ciento condicional al total, binomial de Clopper Pearson para la proporción de detecciones en el estrato y transformado a razón de tasas con la fracción de superficie fija",
+    "block_bootstrap": "2000 réplicas con semilla 20261016. En cada réplica se remuestrean con reemplazo bloques de 10 km por 10 km de las detecciones forestales de 2026, con coordenadas en EPSG:3116, y la fracción de superficie se remuestrea como proporción binomial con el número de puntos de bosque del mapa. Intervalo percentil del 95 por ciento. Se reporta la fracción de réplicas sin detecciones en el estrato de referencia",
+    "applies_to": ["low_elevation_rate_ratio", "edge_rate_ratio"]
+  },
+  "R_window_majority": {
+    "definition": "una detección o un punto cuenta como bosque si al menos el 50 por ciento de su ventana de 13 por 13 píxeles es formación boscosa, sin importar la clase del píxel central. Es la misma regla de ventana boscosa del plan forestal",
+    "metrics": "razón de tasas del bosque bajo 1000 m y razón de borde recalculadas con esa definición en numerador y denominador para todas las temporadas"
+  },
+  "S_thresholds": {
+    "edge": "umbrales mínimos de bosque y de mosaico agropecuario en la ventana de 5, 10 y 20 por ciento",
+    "elevation": "umbrales de altitud de 800, 1000 y 1200 m"
+  },
+  "T_monte_carlo_stability": "segunda muestra independiente de 100000 puntos con semilla 20261017 sobre el mapa de 2024 que corresponde a la temporada 2026. Se reportan las fracciones de superficie y las razones de 2026 con ambas muestras",
+  "reporting_rule": {
+    "position": "para cada sensibilidad, posición de 2026 frente a 2012 a 2025 con percentil que cuenta la mitad de los empates",
+    "statement_low_elevation": "el texto afirma que la concentración del bosque bajo en 2026 supera la serie solo si en todas las sensibilidades de R y S el valor de 2026 queda por encima del máximo de 2012 a 2025 de la misma métrica, y si el límite inferior del intervalo del bootstrap de bloques supera el máximo histórico de la definición principal. Si falla alguna, el texto reporta el valor como alto pero incierto y nombra la sensibilidad que falla",
+    "statement_edge": "la razón de borde se describe como habitual si el valor de 2026 queda dentro del rango de 2012 a 2025 en las tres definiciones de umbral"
+  },
+  "interpretation_limits": [
+    "Las tasas miden densidad de detecciones térmicas por superficie, no área quemada, probabilidad de ignición ni riesgo.",
+    "La nubosidad y la detectabilidad pueden variar con la altitud y no se corrigen.",
+    "La superficie se estima por muestreo Monte Carlo, no por conteo de píxeles."
+  ]
+}

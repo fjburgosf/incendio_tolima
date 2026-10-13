@@ -5,7 +5,8 @@ de MapBiomas 2024. (b) Razón de selección de la cobertura natural frente a las
 detecciones de cada temporada. (c) Razón de tasas de detección del bosque bajo y
 sobre 1000 m por temporada. (d) dNBR de Sentinel-2 en la celda corroborada con más
 píxeles de bosque útiles, con el bosque y las detecciones. Solo grafica salidas de
-los scripts 177, 187 y 188. Punto decimal en todas las etiquetas.
+los scripts 177, 187, 188 y 190. Punto decimal en todas las etiquetas. Letra Calibri
+en tamaño de impresión, con la figura dibujada al ancho de texto de la plantilla.
 """
 
 from __future__ import annotations
@@ -25,6 +26,8 @@ import matplotlib
 matplotlib.use("Agg")
 locale.setlocale(locale.LC_NUMERIC, "C")
 matplotlib.rcParams["axes.formatter.use_locale"] = False
+matplotlib.rcParams.update({"font.family": "Calibri", "font.size": 9, "axes.titlesize": 9.5, "axes.labelsize": 9,
+                            "xtick.labelsize": 8.5, "ytick.labelsize": 8.5, "legend.fontsize": 8.5})
 import matplotlib.pyplot as plt
 import numpy as np
 import tifffile
@@ -34,6 +37,7 @@ from shapely.ops import unary_union
 
 COVER_ROWS = ROOT / "data" / "processed" / "tolima_detection_cover_v1.csv"
 AUDIT187 = ROOT / "results" / "exploratory" / "audit_review_v3_missing_days_area_rates_blocks_v1.json"
+AUDIT190 = ROOT / "results" / "exploratory" / "audit_area_rate_ratio_uncertainty_sensitivity_v1.json"
 CELLS188 = ROOT / "results" / "exploratory" / "sentinel2_forest_cell_corroboration_v2.csv"
 RAW188 = ROOT / "data" / "raw" / "sentinel2_forest_cells_2026_v2"
 DETECTIONS = ROOT / "data" / "interim" / "regional_fire_detections_labelled_v1.csv"
@@ -72,7 +76,7 @@ def main() -> None:
     a187 = json.loads(AUDIT187.read_text(encoding="utf-8"))["L_area_denominators"]["per_season"]
     seasons = sorted(int(s) for s in a187)
 
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 9.0))
+    fig, axes = plt.subplots(2, 2, figsize=(6.5, 5.5))
     ax = axes[0, 0]
     ax.imshow(forest_grid, extent=[lons[0], lons[-1] + step, lats[-1] - step, lats[0]], cmap=ListedColormap(["#f2f2f2", "#9fd39a"]),
               interpolation="nearest", vmin=0, vmax=1)
@@ -80,16 +84,18 @@ def main() -> None:
         for poly in getattr(geom, "geoms", [geom]):
             x, y = poly.exterior.xy
             ax.plot(x, y, color="#9a9a9a", linewidth=0.3)
-    styles = {"agricultural_other": ("#8c6d31", "Mosaico agropecuario"), "natural_non_forest": ("#e6a700", "Natural no boscosa"),
-              "forest_formation": ("#0b5d1e", "Bosque")}
+    styles = {"agricultural_other": ("#8c6d31", "Agropecuario"), "natural_non_forest": ("#e6a700", "No boscosa"),
+              "forest_formation": ("#0b5d1e", "Bosque"), "non_vegetated": ("#4f6dc2", "No vegetada")}
     for group, (color, label) in styles.items():
         sub = [r for r in rows if r["cover_group"] == group]
-        ax.scatter([float(r["longitude"]) for r in sub], [float(r["latitude"]) for r in sub], s=6, color=color, label=f"{label} ({len(sub)})",
+        ax.scatter([float(r["longitude"]) for r in sub], [float(r["latitude"]) for r in sub], s=3, color=color, label=f"{label} ({len(sub)})",
                    linewidths=0)
     ax.set_xlabel("Longitud"); ax.set_ylabel("Latitud")
-    ax.set_title("(a) Detecciones de agosto de 2026 y bosque de 2024", fontsize=10, loc="left")
-    ax.legend(fontsize=7, loc="lower left", frameon=True)
+    ax.set_title("(a) Detecciones de 2026 y bosque de 2024", loc="left")
+    ax.legend(loc="upper left", frameon=False, markerscale=2.5, handletextpad=0.1, borderpad=0.2, labelspacing=0.2, borderaxespad=0.2)
     ax.set_aspect("equal")
+    ax.set_xlim(west - 0.85, east + 0.05); ax.set_ylim(south - 0.05, north + 0.05)
+    ax.set_xticks([-76.5, -75.5, -74.5])
 
     ax = axes[0, 1]
     det = [a187[str(s)]["detections"] for s in seasons]
@@ -97,23 +103,29 @@ def main() -> None:
     for s, d, n in zip(seasons, det, nat):
         ax.scatter(d, n, s=40 if s == 2026 else 22, color="#b30000" if s == 2026 else "#4d4d4d", zorder=3)
         if s in (2019, 2026, 2021, 2017):
-            ax.annotate(str(s), (d, n), textcoords="offset points", xytext=(4, 3), fontsize=7)
+            ax.annotate(str(s), (d, n), textcoords="offset points", xytext=(3, 2), fontsize=8)
     ax.set_xlabel("Detecciones de agosto en Tolima")
-    ax.set_ylabel("Razón de selección de la cobertura natural")
-    ax.set_title("(b) Cobertura natural y actividad de la temporada", fontsize=10, loc="left")
+    ax.set_ylabel("Razón de selección natural")
+    ax.set_title("(b) Cobertura natural y actividad", loc="left")
     ax.grid(alpha=0.3)
 
     ax = axes[1, 0]
     low = [a187[str(s)]["low_elevation_rate_ratio"] for s in seasons]
-    ax.bar([str(s) for s in seasons], low, color=["#b30000" if s == 2026 else "#7f7f7f" for s in seasons])
+    labels = [f"{s % 100:02d}" for s in seasons]
+    ax.bar(labels, low, color=["#b30000" if s == 2026 else "#7f7f7f" for s in seasons])
+    if AUDIT190.exists():
+        lo, hi = json.loads(AUDIT190.read_text(encoding="utf-8"))["Q_uncertainty_2026"]["block_bootstrap"]["low_elevation_rate_ratio"]["interval_95"]
+        if np.isfinite(hi):
+            ax.errorbar([labels[-1]], [low[-1]], yerr=[[low[-1] - lo], [hi - low[-1]]], color="black", capsize=2, linewidth=0.8)
     ax.set_yscale("log")
-    ax.yaxis.set_major_locator(matplotlib.ticker.FixedLocator([2, 5, 10, 20, 40]))
+    ax.yaxis.set_major_locator(matplotlib.ticker.FixedLocator([2, 5, 10, 20, 50, 100, 200]))
     ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, p: f"{v:g}"))
-    ax.set_ylim(2, 50)
-    ax.set_ylabel("Razón de tasas, bosque bajo y sobre 1000 m")
-    ax.set_title("(c) Concentración del fuego en bosque bajo", fontsize=10, loc="left")
-    ax.tick_params(axis="x", labelrotation=90, labelsize=7)
+    ax.set_ylim(2, 200)
+    ax.set_ylabel("Razón de tasas bajo y sobre 1000 m")
+    ax.set_xlabel("Temporada (20xx)")
+    ax.set_title("(c) Concentración en bosque bajo", loc="left")
+    ax.tick_params(axis="x", labelsize=8)
     ax.grid(axis="y", alpha=0.3)
 
     cells = [r for r in csv.DictReader(CELLS188.open(encoding="utf-8")) if r["status"] == "corroborated"]
@@ -141,10 +153,11 @@ def main() -> None:
         ex, ey = (lo - lon0) * mlon, (la - lat0) * mlat
         ax.add_patch(plt.Rectangle((ex - 187.5, ey - 187.5), 375, 375, fill=False, edgecolor="black", linewidth=0.8))
     ax.set_xlabel("Distancia al este (m)"); ax.set_ylabel("Distancia al norte (m)")
+    ax.set_xticks([-1000, 0, 1000]); ax.set_yticks([-1000, 0, 1000])
     months = {"07": "julio", "08": "agosto", "09": "septiembre"}
     def nice(d):
         return f"{int(d[8:10])} de {months[d[5:7]]}"
-    ax.set_title(f"(d) dNBR Sentinel-2, {nice(best['pre_date'])} a {nice(best['post_date'])} de 2026", fontsize=10, loc="left")
+    ax.set_title(f"(d) dNBR, {nice(best['pre_date'])} a {nice(best['post_date'])}", loc="left")
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04); cb.set_label("dNBR")
     fig.tight_layout()
     OUT.parent.mkdir(parents=True, exist_ok=True); OUT_JPG.parent.mkdir(parents=True, exist_ok=True)
